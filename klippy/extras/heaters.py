@@ -4,6 +4,7 @@
 #
 # This file may be distributed under the terms of the GNU GPLv3 license.
 import os, logging, threading
+from . import pla_ino_heater
 
 
 ######################################################################
@@ -263,7 +264,21 @@ class PrinterHeaters:
         # Setup sensor
         sensor = self.setup_sensor(config)
         # Create heater
-        self.heaters[heater_name] = heater = Heater(config, sensor)
+        # In the .cfg an additional field can be added to the extruder called 'heater_type'
+        # If set to 'PLA_INO' the custom INO heater class will be used rather than the standard heater class
+        heater_type = config.get("heater_type", "Standard")
+        logging.info(f"J: heater_type: {heater_type}")
+        if heater_type == "PLA_INO":
+            heater_class = pla_ino_heater.PLA_INO_Heater
+        else:
+            heater_class = Heater
+        self.heaters[heater_name] = heater = heater_class(config, sensor)
+        logging.info(f"J: heater sensor: {sensor}")
+        # If an INO heater was initialized (and therefore an INO Sensor as the heater sensor)
+        # the 'make_heater_known' function is called in order to tell the sensor which heater it belongs to
+        if heater_type == "PLA_INO":
+            sensor.make_heater_known(self.heaters[heater_name], config)
+
         self.register_sensor(config, heater, gcode_id)
         self.available_heaters.append(config.get_name())
         return heater
