@@ -14,8 +14,7 @@ This will guide you through the setup of the Ino Trident for Klipper. It will re
 
 ```bash
 rm -rf ~/klipper
-cd ~/ && git clone git@gitlab.com:plasmics/klipper_joey.git
-mv klipper_joey klipper
+cd ~/ && git clone git@github.com:Plasmics-3D/klipper.git
 ```
 
 3. Run the following command to identify the USB serial port:
