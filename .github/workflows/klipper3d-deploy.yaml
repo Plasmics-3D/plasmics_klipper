@@ -4,7 +4,7 @@ on:
     - cron: "0 0 * * *"
   push:
     branches:
-      - master
+      - main
     paths:
       - docs/**
       - .github/workflows/klipper3d-deploy.yaml
