@@ -82,6 +82,11 @@ class PLA_INO_Sensor:
                 self.cmd_INO_DEBUG_OUT,
                 desc=self.cmd_INO_DEBUG_OUT_help,
             )
+            self.gcode.register_command(
+                "INO_DEBUG_OUT",
+                self.cmd_INO_FIRMWARE_VERSION,
+                desc=self.cmd_INO_FIRMWARE_VERSION_help,
+            )
             logging.info(f"J: All Gcode commands added.")
 
     def make_heater_known(self, heater, config):
@@ -456,6 +461,22 @@ class PLA_INO_Sensor:
 
         self._send_commands_to_extruder_ino(heater, s, gcmd)
 
+    cmd_INO_FIRMWARE_VERSION_help = "read out firmware version of INO"
+
+    def cmd_INO_FIRMWARE_VERSION(self, gcmd):
+        """custom gcode command for reading the firmware version of the INO
+
+        :param gcmd: gcode command (object) that is processed
+        :type gcmd: ?
+        """
+        index = gcmd.get_int("T", None, minval=0)
+        s = "v"
+
+        extruder = self._get_extruder_for_commands(index, gcmd)
+        heater = extruder.get_heater()
+
+        self._send_commands_to_extruder_ino(heater, s, gcmd)
+
     def _process_read_queue(self):
         # Process any decoded lines from the device
         while not len(self.read_queue) == 0:
@@ -509,14 +530,10 @@ class PLA_INO_Sensor:
                     self.read_from_board_outs.pop(0)
 
             else:
-                self.gcode.respond_info(
-                    "PID values, save these in printer.cfg in the [extruder] section and restart firmware:\n"
-                    + str(tmp)
+                self.gcode.respond_info(f"Output from INO: {str(tmp)}"
                 )
                 logging.info(
-                    "\n--------------------PID AUTOTUNED VALUES: ------------------------\n"
-                    + str(tmp)
-                    + "\n--------------------PID AUTOTUNED VALUES: ------------------------\n"
+                    f"J: Output from INO: {str(tmp)}"
                 )
 
 
