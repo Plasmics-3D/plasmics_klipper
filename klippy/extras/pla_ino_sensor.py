@@ -83,7 +83,7 @@ class PLA_INO_Sensor:
                 desc=self.cmd_INO_DEBUG_OUT_help,
             )
             self.gcode.register_command(
-                "INO_DEBUG_OUT",
+                "INO_FIRMWARE_VERSION",
                 self.cmd_INO_FIRMWARE_VERSION,
                 desc=self.cmd_INO_FIRMWARE_VERSION_help,
             )
