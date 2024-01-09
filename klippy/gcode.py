@@ -174,6 +174,10 @@ class GCodeDispatch:
     args_r = re.compile('([A-Z_]+|[A-Z*/])')
     def _process_commands(self, commands, need_ack=True):
         for line in commands:
+            ### This is the code snippet necessary to collect gcode info!
+            if "gcode_tracker printer" in self.printer.objects:
+                self.printer.lookup_object("gcode_tracker printer").add_to_batch(line)
+            ###
             # Ignore comments and leading/trailing spaces
             line = origline = line.strip()
             cpos = line.find(';')
