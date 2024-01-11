@@ -54,7 +54,7 @@ class GcodeTracker:
         try:
             with open("/home/pi/harvest/harvest.log", "a+") as log_file:
                 process = subprocess.Popen(
-                    ["/home/pi/klippy-env/bin/python", script_name],
+                    ["/home/pi/harvest-env/bin/python", script_name],
                     stdout=log_file,
                     stderr=subprocess.STDOUT,
                     shell=False,
