@@ -315,6 +315,7 @@ class ToolHead:
         # Queue moves into trapezoid motion queue (trapq)
         next_move_time = self.print_time
         for move in moves:
+            logging.info(f"J: toolhead: move {move}")
             if move.is_kinematic_move:
                 self.trapq_append(
                     self.trapq, next_move_time,
@@ -327,6 +328,7 @@ class ToolHead:
             next_move_time = (next_move_time + move.accel_t
                               + move.cruise_t + move.decel_t)
             for cb in move.timing_callbacks:
+                logging.info(f"J: toolhead: cb {cb}")
                 cb(next_move_time)
         # Generate steps for moves
         if self.special_queuing_state:
