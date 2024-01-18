@@ -197,6 +197,7 @@ class GCodeDispatch:
                        for i in range(1, numparts, 2) }
             gcmd = GCodeCommand(self, cmd, origline, params, need_ack)
             # Invoke handler for command
+            logging.info(f"J: gcode command {line}")
             handler = self.gcode_handlers.get(cmd, self.cmd_default)
             try:
                 handler(gcmd)
