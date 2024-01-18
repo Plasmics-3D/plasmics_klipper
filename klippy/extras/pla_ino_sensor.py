@@ -188,7 +188,7 @@ class PLA_INO_Sensor:
         :return: _description_
         :rtype: _type_
         """
-        logging.info(f"J: SAMPLE PLA INO CALLED WITH TIME {eventtime}")
+        # logging.info(f"J: SAMPLE PLA INO CALLED WITH TIME {eventtime}")
         if self._failed_connection_attempts < 5:
             try:
                 if self.serial is None:
@@ -284,7 +284,7 @@ class PLA_INO_Sensor:
             else:
                 break
 
-        logging.info(f"J: Read queue contents: {self.read_queue}")
+        # logging.info(f"J: Read queue contents: {self.read_queue}")
 
         self._process_read_queue()
         return eventtime + SERIAL_TIMER
@@ -298,9 +298,9 @@ class PLA_INO_Sensor:
         :rtype: ?
         """
         while not len(self.write_queue) == 0:
-            logging.info(
-                f"J: Current elements in the write queue waiting to be sent to ino: {self.write_queue}"
-            )
+            # logging.info(
+            #     f"J: Current elements in the write queue waiting to be sent to ino: {self.write_queue}"
+            # )
             text_line = self.write_queue.pop(0)
 
             if text_line:
@@ -311,7 +311,7 @@ class PLA_INO_Sensor:
                     self.disconnect()
                     break
 
-        logging.info("J: Write queue is empty.")
+        # logging.info("J: Write queue is empty.")
         return eventtime + SERIAL_TIMER
 
     def _get_extruder_for_commands(self, index, gcmd):
@@ -345,9 +345,9 @@ class PLA_INO_Sensor:
         :raises gcmd.error: raises error if command can not be executed on the configured heater
         """
         if heater.__class__.__name__ == "PLA_INO_Heater":
-            logging.info("J: sending command to PLA_INO_Heater")
+            # logging.info("J: sending command to PLA_INO_Heater")
             queue = heater.sensor.write_queue
-            logging.info(f"J: queue: {queue}, message: {message}")
+            # logging.info(f"J: queue: {queue}, message: {message}")
             queue.append(message)
         else:
             raise gcmd.error("Command not defined for this heater.")
@@ -500,7 +500,7 @@ class PLA_INO_Sensor:
 
                 self.temp = int(debug_dictionary["T_a"]) / 100
 
-                logging.info(f"J: debug dictionary: {debug_dictionary}")
+                # logging.info(f"J: debug dictionary: {debug_dictionary}")
                 # for error output:
                 read_from_board = str(debug_dictionary["err"]).zfill(
                     6
@@ -517,9 +517,9 @@ class PLA_INO_Sensor:
                     read_from_board_out = read_from_board_out + " | heating fast"
                 if read_from_board[4] == "1":
                     read_from_board_out = read_from_board_out + " | no temp read"
-                logging.info(
-                    f"J: INO debug output {debug_dictionary},{read_from_board}"
-                )
+                # logging.info(
+                #     f"J: INO debug output {debug_dictionary},{read_from_board}"
+                # )
 
                 self.debug_dictionaries.append(debug_dictionary)
                 self.read_from_board_outs.append(read_from_board_out)
