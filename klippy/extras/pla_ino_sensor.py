@@ -532,9 +532,9 @@ class PLA_INO_Sensor:
             else:
                 self.gcode.respond_info(f"Output from INO: {str(tmp)}"
                 )
-                logging.info(
-                    f"J: Output from INO: {str(tmp)}"
-                )
+                # logging.info(
+                #     f"J: Output from INO: {str(tmp)}"
+                # )
 
 
 def load_config(config):

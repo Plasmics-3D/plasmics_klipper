@@ -315,7 +315,7 @@ class ToolHead:
         # Queue moves into trapezoid motion queue (trapq)
         next_move_time = self.print_time
         for move in moves:
-            logging.info(f"J: toolhead: {self.reactor.monotonic()} move start:{move.start_pos} move end:{move.end_pos}")
+            logging.info(f"JTIMINGTEST: toolhead: {self.reactor.monotonic()} move start:{move.start_pos} move end:{move.end_pos}")
             if move.is_kinematic_move:
                 self.trapq_append(
                     self.trapq, next_move_time,
