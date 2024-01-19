@@ -840,6 +840,7 @@ class MoveSplitter:
                 self.current_pos[i] = lerp(
                     t, self.prev_pos[i], self.next_pos[i])
     def split(self):
+        logging.info(f"J: bed_mesh: split: SPLITTING MOVE {self.gcode}")
         if not self.traverse_complete:
             if self.axis_move[0] or self.axis_move[1]:
                 # X and/or Y axis move, traverse if necessary
