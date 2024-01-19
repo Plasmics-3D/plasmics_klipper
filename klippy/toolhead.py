@@ -13,6 +13,7 @@ import mcu, chelper, kinematics.extruder
 # Class to track each move request
 class Move:
     def __init__(self, toolhead, start_pos, end_pos, speed):
+        logging.info(f"J: toolhead: Move: {start_pos}, {end_pos}")
         self.toolhead = toolhead
         self.start_pos = tuple(start_pos)
         self.end_pos = tuple(end_pos)
@@ -177,6 +178,7 @@ class MoveQueue:
         # Remove processed moves from the queue
         del queue[:flush_count]
     def add_move(self, move):
+        logging.info("J: toolhead: add_move called!")
         self.queue.append(move)
         if len(self.queue) == 1:
             return
@@ -417,6 +419,7 @@ class ToolHead:
         self.kin.set_position(newpos, homing_axes)
         self.printer.send_event("toolhead:set_position")
     def move(self, newpos, speed):
+        logging.info(f"J: toolhead: move: called with newpos {newpos}")
         move = Move(self, self.commanded_pos, newpos, speed)
         if not move.move_d:
             return

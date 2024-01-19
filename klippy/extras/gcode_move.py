@@ -111,6 +111,7 @@ class GCodeMove:
             self.last_position = self.position_with_transform()
     # G-Code movement commands
     def cmd_G1(self, gcmd):
+        logging.info("J: gcode_move: cmdG1 called")
         # Move
         params = gcmd.get_command_parameters()
         try:
