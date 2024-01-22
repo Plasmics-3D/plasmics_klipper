@@ -178,7 +178,6 @@ class MoveQueue:
         # Remove processed moves from the queue
         del queue[:flush_count]
     def add_move(self, move):
-        logging.info("J: toolhead: add_move called!")
         self.queue.append(move)
         if len(self.queue) == 1:
             return
@@ -317,8 +316,7 @@ class ToolHead:
         # Queue moves into trapezoid motion queue (trapq)
         next_move_time = self.print_time
         for move in moves:
-            logging.info(f"JTIMINGTEST: toolhead: {self.reactor.monotonic()} move start:{move.start_pos} move end:{move.end_pos}, is_kinematic = {move.is_kinematic_move}, move.axes_d[3] = {move.axes_d[3]}")
-            logging.info(f"J: get motion report: {self.printer.lookup_object('motion_report').get_status(self.reactor.monotonic())}")
+            # logging.info(f"JTIMINGTEST: toolhead: {self.reactor.monotonic()} move start:{move.start_pos} move end:{move.end_pos}, is_kinematic = {move.is_kinematic_move}, move.axes_d[3] = {move.axes_d[3]}")
             if move.is_kinematic_move:
                 self.trapq_append(
                     self.trapq, next_move_time,
@@ -331,7 +329,6 @@ class ToolHead:
             next_move_time = (next_move_time + move.accel_t
                               + move.cruise_t + move.decel_t)
             for cb in move.timing_callbacks:
-                logging.info(f"J: toolhead: cb {cb}")
                 cb(next_move_time)
         # Generate steps for moves
         if self.special_queuing_state:
@@ -420,7 +417,6 @@ class ToolHead:
         self.kin.set_position(newpos, homing_axes)
         self.printer.send_event("toolhead:set_position")
     def move(self, newpos, speed):
-        logging.info(f"J: toolhead: move: called with newpos {newpos}")
         move = Move(self, self.commanded_pos, newpos, speed)
         if not move.move_d:
             return
