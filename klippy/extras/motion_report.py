@@ -232,6 +232,7 @@ STATUS_REFRESH_TIME = 0.250
 
 class PrinterMotionReport:
     def __init__(self, config):
+        logging.info("J: PrinterMotionReport initialized")
         self.printer = config.get_printer()
         self.steppers = {}
         self.trapqs = {}
@@ -302,6 +303,7 @@ class PrinterMotionReport:
     # Status reporting
     def get_status(self, eventtime):
         if eventtime < self.next_status_time or not self.trapqs:
+            logging.info(f"J: motion_report, get_status: {self.last_status}")
             return self.last_status
         self.next_status_time = eventtime + STATUS_REFRESH_TIME
         xyzpos = (0., 0., 0.)
