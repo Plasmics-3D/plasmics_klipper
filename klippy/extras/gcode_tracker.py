@@ -32,6 +32,8 @@ class GcodeTracker:
         self.gcode = self.printer.lookup_object("gcode")
 
         _ = config.get("serial", "")
+        self.get_position_time_delta = config.getfloat("get_position_time_delta", 0.1)
+
 
         self.gcode.register_output_handler(self._respond_raw)
         self.printer.register_event_handler("klippy:shutdown", self._handle_shutdown)
@@ -74,7 +76,7 @@ class GcodeTracker:
             logging.info(f"J: gcode_tracker: timestamp: {self.reactor.monotonic()}, motion report: {self.printer.lookup_object('motion_report').get_status(eventtime)}")
         except Exception as e:
             logging.info(f"J: gcode_tracker get printer position: {e}")
-        return eventtime + 0.1
+        return eventtime + self.get_position_time_delta
 
 
     def get_status(self, eventtime) -> dict:
