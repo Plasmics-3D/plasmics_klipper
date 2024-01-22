@@ -69,8 +69,8 @@ class GcodeTracker:
             self._get_printer_position, self.reactor.NOW
         )
 
-    def _get_printer_position(self):
-        logging.info(f"J: gcode_tracker: timestamp: {self.reactor.monotonic()}, motion report: {self.printer.lookup_object('motion_report').get_status(self.reactor.monotonic())}")
+    def _get_printer_position(self, eventtime):
+        logging.info(f"J: gcode_tracker: timestamp: {self.reactor.monotonic()}, motion report: {self.printer.lookup_object('motion_report').get_status(eventtime)}")
 
 
     def get_status(self, eventtime) -> dict:
