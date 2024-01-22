@@ -70,7 +70,10 @@ class GcodeTracker:
         )
 
     def _get_printer_position(self, eventtime):
-        logging.info(f"J: gcode_tracker: timestamp: {self.reactor.monotonic()}, motion report: {self.printer.lookup_object('motion_report').get_status(eventtime)}")
+        try:
+            logging.info(f"J: gcode_tracker: timestamp: {self.reactor.monotonic()}, motion report: {self.printer.lookup_object('motion_report').get_status(eventtime)}")
+        except Exception as e:
+            logging.info(f"J: gcode_tracker get printer position: {e}")
 
 
     def get_status(self, eventtime) -> dict:
