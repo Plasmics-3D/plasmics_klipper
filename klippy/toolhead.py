@@ -318,7 +318,7 @@ class ToolHead:
         next_move_time = self.print_time
         for move in moves:
             logging.info(f"JTIMINGTEST: toolhead: {self.reactor.monotonic()} move start:{move.start_pos} move end:{move.end_pos}, is_kinematic = {move.is_kinematic_move}, move.axes_d[3] = {move.axes_d[3]}")
-            logging.info(f"J: get motion report: {self.printer.lookup_object('motion_report').get_status()}")
+            logging.info(f"J: get motion report: {self.printer.lookup_object('motion_report').get_status(self.reactor.monotonic())}")
             if move.is_kinematic_move:
                 self.trapq_append(
                     self.trapq, next_move_time,
