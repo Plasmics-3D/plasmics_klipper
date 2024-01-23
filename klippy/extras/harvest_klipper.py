@@ -92,14 +92,17 @@ class HarvestKlipper:
 
     def get_status(self, eventtime) -> dict:
         """This function is present in most modules and allows to read out the status of this module
-        over different queries. Not needed, but included for the sake of completness.
+        over different queries. Needed for passing down the print job id to harvest
 
         :param eventtime: The time of when the get_status was actually called
         :type eventtime: ?
         :return: Dictionary of the eventtime, and the name of this module (as a placeholder)
         :rtype: dict
         """
-        return {"eventtime": eventtime, "name": "Harves-klipper"}
+        return {
+            "eventtime": eventtime,
+            "current_print_id": self.print_job_id,
+        }
 
     def _respond_raw(self, msg: str) -> None:
         """Script that is triggered if the gcode object sends out a message. If a file is done printing, the
