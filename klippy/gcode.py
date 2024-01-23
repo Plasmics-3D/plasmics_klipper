@@ -176,7 +176,7 @@ class GCodeDispatch:
     def _process_commands(self, commands, need_ack=True):
         for line in commands:
             ### This is the code snippet necessary to collect gcode info!
-            if "harvest_tracker" in self.printer.objects:
+            if "harvest_klipper" in self.printer.objects:
                 self.printer.lookup_object("gcode_tracker printer").add_to_batch(batch_name = "gcode", entry=line)
             ###
             # Ignore comments and leading/trailing spaces
