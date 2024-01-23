@@ -145,7 +145,7 @@ class HarvestKlipper:
         :param batch_name: the name of the batch that should be written to file
         :type batch_name: str"""
 
-        current_batch = self.batches[batch_name]["batch"]
+        current_batch = self.batches[batch_name]
         if len(current_batch["batch"]) > 0:
             logging.info(f"J: Writing batch {batch_name} to file")
             open(current_batch["file_path"], "a+").writelines(current_batch["batch"])
