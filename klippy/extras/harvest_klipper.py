@@ -168,7 +168,7 @@ class HarvestKlipper:
         :type entry: str
         """
         self._print_start_processing(entry)
-        current_batch = self.batches[batch_name]["batch"]
+        current_batch = self.batches[batch_name]
         if self.new_print_job_flag:
             self._write_batch_to_file(batch_name=batch_name)
             current_batch["last"] = ""
