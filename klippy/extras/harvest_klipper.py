@@ -196,7 +196,7 @@ class HarvestKlipper:
                 line = f"{eventtime},{self.motion_report.get_status(eventtime)}"
                 self.add_to_batch(batch_name="toolheadposition", entry=line)
             except Exception as e:
-                logging.info(f"J: Harvest-klipper printer position ERROR: {e}")
+                logging.error(f"J: Harvest-klipper printer position ERROR: {e}")
         return eventtime + self.get_position_time_delta
 
 
