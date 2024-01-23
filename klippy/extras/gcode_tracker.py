@@ -6,7 +6,6 @@ import sys
 import subprocess
 import random
 
-from motion_report import PrinterMotionReport
 # setting path
 sys.path.append("/home/pi/harvest")
 from shutdown_object import ShutdownObject
@@ -68,15 +67,16 @@ class GcodeTracker:
         except Exception as e:
             logging.info(f"Error starting {script_name}: {e}")
 
-        self.printer_motion_report = PrinterMotionReport(config)
+        # self.printer_motion_report = PrinterMotionReport(config)
 
         self.timer = self.reactor.register_timer(
             self._get_printer_position, self.reactor.NOW
         )
+        self.motion_report = self.printer.lookup_object("motion_report")
 
     def _get_printer_position(self, eventtime):
         try:
-            logging.info(f"J: gcode_tracker: timestamp: {eventtime}, motion report: {self.printer_motion_report.get_status(eventtime)}")
+            logging.info(f"J: gcode_tracker: timestamp: {self.reactor.monotonic()} {eventtime} {self.motion_report.get_status(eventtime)}")
         except Exception as e:
             logging.info(f"J: gcode_tracker get printer position: {e}")
         return eventtime + self.get_position_time_delta
@@ -166,5 +166,5 @@ class GcodeTracker:
             self.new_print_job_flag = False
 
 
-def load_config_prefix(config):
+def load_config(config):
     return GcodeTracker(config)

@@ -232,7 +232,6 @@ STATUS_REFRESH_TIME = 0.250
 
 class PrinterMotionReport:
     def __init__(self, config):
-        logging.info("J: PrinterMotionReport initialized")
         self.printer = config.get_printer()
         self.steppers = {}
         self.trapqs = {}
