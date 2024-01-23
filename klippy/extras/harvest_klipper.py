@@ -147,7 +147,9 @@ class HarvestKlipper:
 
         current_batch = self.batches[batch_name]
         if len(current_batch["batch"]) > 0:
-            logging.info(f"J: Writing batch {batch_name} to file")
+            logging.info(
+                f"J: Writing batch {batch_name} to file {current_batch['file_path']}"
+            )
             open(current_batch["file_path"], "a+").writelines(current_batch["batch"])
             logging.info(f"J: Writing batch {batch_name} to file - done")
             current_batch["batch"] = []
