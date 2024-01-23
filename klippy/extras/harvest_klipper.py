@@ -149,7 +149,7 @@ class HarvestKlipper:
         if len(current_batch["batch"]) > 0:
             logging.info(f"J: Writing batch {batch_name} to file")
             open(current_batch["file_path"], "a+").writelines(current_batch["batch"])
-            logging.info("J: Writing batch {batch_name} to file - done")
+            logging.info(f"J: Writing batch {batch_name} to file - done")
             current_batch["batch"] = []
             current_batch["batch_counter"] += 1
             current_batch["file_path"] = os.path.join(
