@@ -73,12 +73,14 @@ class GcodeTracker:
             self._get_printer_position, self.reactor.NOW
         )
         self.motion_report = self.printer.lookup_object("motion_report")
+        self.virtual_sdcard = self.printer.lookup_object("virtual_sdcard")
 
     def _get_printer_position(self, eventtime):
-        try:
-            logging.info(f"J: gcode_tracker: timestamp: {self.reactor.monotonic()} {eventtime} {self.motion_report.get_status(eventtime)}")
-        except Exception as e:
-            logging.info(f"J: gcode_tracker get printer position: {e}")
+        if self.virtual_sdcard.is_active():
+            try:
+                logging.info(f"J: gcode_tracker: timestamp: {self.reactor.monotonic()} {eventtime} {self.motion_report.get_status(eventtime)}")
+            except Exception as e:
+                logging.info(f"J: gcode_tracker get printer position: {e}")
         return eventtime + self.get_position_time_delta
 
 
