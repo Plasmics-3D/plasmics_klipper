@@ -48,7 +48,7 @@ class HarvestKlipper:
             "gcode": {
                 "counter": 0,
                 "batch": [],
-                "batch_counter": [],
+                "batch_counter": 0,
                 "last": None,
                 "file_path": os.path.join(
                     OUTPUT_PATH,
@@ -58,7 +58,7 @@ class HarvestKlipper:
             "toolheadposition": {
                 "counter": 0,
                 "batch": [],
-                "batch_counter": [],
+                "batch_counter": 0,
                 "last": None,
                 "file_path": os.path.join(
                     OUTPUT_PATH,
@@ -156,7 +156,7 @@ class HarvestKlipper:
             current_batch["batch_counter"] += 1
             current_batch["file_path"] = os.path.join(
                 OUTPUT_PATH,
-                f"{self.print_job_id}_{batch_name}_{self.current_batch['batch_counter']}.csv",
+                f"{self.print_job_id}_{batch_name}_{current_batch['batch_counter']}.csv",
             )
 
     def add_to_batch(self, batch_name: str, entry: str) -> None:
@@ -170,7 +170,10 @@ class HarvestKlipper:
         :type entry: str
         """
         self._print_start_processing(entry)
-        current_batch = self.batches[batch_name]
+        try:
+            current_batch = self.batches[batch_name]
+        except Exception as e:
+            logging.error(f"J: Harvest-klipper printer position ERROR: {e}")
         if self.new_print_job_flag:
             self._write_batch_to_file(batch_name=batch_name)
             current_batch["last"] = ""
