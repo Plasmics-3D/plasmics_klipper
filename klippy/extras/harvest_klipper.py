@@ -103,10 +103,7 @@ class HarvestKlipper:
             self._get_printer_position, self.reactor.NOW
         )
 
-        self.ino_timer = self.reactor.register_timer(
-            self._get_ino, self.reactor.NOW
-        )
-        
+        self.ino_timer = self.reactor.register_timer(self._get_ino, self.reactor.NOW)
 
     def get_status(self, eventtime) -> dict:
         """This function is present in most modules and allows to read out the status of this module
@@ -121,13 +118,15 @@ class HarvestKlipper:
             "eventtime": eventtime,
             "current_print_id": self.print_job_id,
         }
-    
-    def _connect(self)->None:
-        """Upon connect, get the available INO sensors
-        """
-        self.ino_sensors = [i[1] for i in self.printer.lookup_objects("pla_ino_sensor") if i[1] is not None]
-        logging.info(f"J: INO sensor registered: {self.ino_sensors}")
 
+    def _connect(self) -> None:
+        """Upon connect, get the available INO sensors"""
+        self.ino_sensors = [
+            i[1]
+            for i in self.printer.lookup_objects("pla_ino_sensor")
+            if i[1] is not None
+        ]
+        logging.info(f"J: INO sensor registered: {self.ino_sensors}")
 
     def _respond_raw(self, msg: str) -> None:
         """Script that is triggered if the gcode object sends out a message. If a file is done printing, the
@@ -226,12 +225,12 @@ class HarvestKlipper:
                 #     f"J: Harvest-klipper: timestamp: {self.reactor.monotonic()},{eventtime},{self.motion_report.get_status(eventtime)}"
                 # )
                 status = self.motion_report.get_status(eventtime)
-                line = f"{status['live_position']},{status['live_velocity']},{status['live_extruder_velocity']}"
+                line = f"{eventtime},{status['live_position']},{status['live_velocity']},{status['live_extruder_velocity']}"
                 self.add_to_batch(batch_name="toolheadposition", entry=line)
             except Exception as e:
                 logging.error(f"J: Harvest-klipper printer position ERROR: {e}")
         return eventtime + self.get_position_time_delta
-    
+
     def _get_ino(self, eventtime):
         if self.virtual_sdcard.is_active():
             for i in self.ino_sensors:
