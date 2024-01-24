@@ -199,23 +199,24 @@ class HarvestKlipper:
             current_batch = self.batches[batch_name]
         except Exception as e:
             logging.error(f"J: Harvest-klipper printer position ERROR: {e}")
-        if self.new_print_job_flag:
-            self._write_batch_to_file(batch_name=batch_name)
-            current_batch["last"] = ""
-            current_batch["counter"] = 0
-            current_batch["batch_counter"] = 0
-            current_batch["file_path"] = os.path.join(
-                OUTPUT_PATH,
-                f"{self.print_job_id}_{batch_name}_{0}.csv",
-            )
         else:
-            self.gcode_last_cmd = entry
-            current_batch["counter"] += 1
-        current_batch["batch"].append(
-            f"{current_batch['counter']},{self.reactor.monotonic()},{entry}\n"
-        )
-        if len(current_batch["batch"]) >= 1000:
-            self._write_batch_to_file(batch_name=batch_name)
+            if self.new_print_job_flag:
+                self._write_batch_to_file(batch_name=batch_name)
+                current_batch["last"] = ""
+                current_batch["counter"] = 0
+                current_batch["batch_counter"] = 0
+                current_batch["file_path"] = os.path.join(
+                    OUTPUT_PATH,
+                    f"{self.print_job_id}_{batch_name}_{0}.csv",
+                )
+            else:
+                current_batch["last"] = entry
+                current_batch["counter"] += 1
+            current_batch["batch"].append(
+                f"{current_batch['counter']},{self.reactor.monotonic()},{entry}\n"
+            )
+            if len(current_batch["batch"]) >= 1000:
+                self._write_batch_to_file(batch_name=batch_name)
 
     def _get_printer_position(self, eventtime):
         if self.virtual_sdcard.is_active():
