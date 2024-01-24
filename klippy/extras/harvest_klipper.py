@@ -30,9 +30,12 @@ class HarvestKlipper:
         self.gcode = self.printer.lookup_object("gcode")
         self.motion_report = self.printer.lookup_object("motion_report")
         self.virtual_sdcard = self.printer.lookup_object("virtual_sdcard")
+        self.ino_sensors = self.printer.lookup_objects("pla_ino_sensor")
+        logging.info(f"J: INO SENSOR REGISTERED {self.ino_sensors}")
 
         _ = config.get("serial", "")
         self.get_position_time_delta = config.getfloat("get_position_time_delta", 0.1)
+        self.get_ino_time_delta = config.getfloat("get_position_time_delta", 0.1)
 
         self.gcode.register_output_handler(self._respond_raw)
         self.printer.register_event_handler("klippy:shutdown", self._handle_shutdown)
@@ -98,6 +101,10 @@ class HarvestKlipper:
         # get the calculated position of the printer every get_position_time_delta ms
         self.printer_position_timer = self.reactor.register_timer(
             self._get_printer_position, self.reactor.NOW
+        )
+
+        self.ino_timer = self.reactor.register_timer(
+            self._get_ino, self.reactor.NOW
         )
         
 
@@ -214,6 +221,20 @@ class HarvestKlipper:
                 self.add_to_batch(batch_name="toolheadposition", entry=line)
             except Exception as e:
                 logging.error(f"J: Harvest-klipper printer position ERROR: {e}")
+        return eventtime + self.get_position_time_delta
+    
+    def _get_ino(self, eventtime):
+        if self.virtual_sdcard.is_active():
+            logging.info("J: GET INO")
+            # try:
+            #     # logging.info(
+            #     #     f"J: Harvest-klipper: timestamp: {self.reactor.monotonic()},{eventtime},{self.motion_report.get_status(eventtime)}"
+            #     # )
+            #     status = self.motion_report.get_status(eventtime)
+            #     line = f"{eventtime},{status['live_position']},{status['live_velocity']},{status['live_extruder_velocity']}"
+            #     self.add_to_batch(batch_name="toolheadposition", entry=line)
+            # except Exception as e:
+            #     logging.error(f"J: Harvest-klipper printer position ERROR: {e}")
         return eventtime + self.get_position_time_delta
 
 
