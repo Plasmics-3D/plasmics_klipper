@@ -195,23 +195,24 @@ class HarvestKlipper:
         :type entry: str
         """
         self._print_start_processing(entry)
-        try:
-            current_batch = self.batches[batch_name]
-        except Exception as e:
-            logging.error(f"J: Harvest-klipper printer position ERROR: {e}")
-        else:
-            if self.new_print_job_flag:
-                self._write_batch_to_file(batch_name=batch_name)
+        if self.new_print_job_flag:
+            for i in self.all_batch_names:
+                current_batch = self.batches[i]
+                self._write_batch_to_file(batch_name=i)
                 current_batch["last"] = ""
                 current_batch["counter"] = 0
                 current_batch["batch_counter"] = 0
                 current_batch["file_path"] = os.path.join(
                     OUTPUT_PATH,
-                    f"{self.print_job_id}_{batch_name}_{0}.csv",
+                    f"{self.print_job_id}_{i}_{0}.csv",
                 )
-            else:
-                current_batch["last"] = entry
-                current_batch["counter"] += 1
+        try:
+            current_batch = self.batches[batch_name]
+        except Exception as e:
+            logging.error(f"J: Harvest-klipper printer position ERROR: {e}")
+        else:
+            current_batch["last"] = entry
+            current_batch["counter"] += 1
             current_batch["batch"].append(
                 f"{current_batch['counter']},{self.reactor.monotonic()},{entry}\n"
             )
