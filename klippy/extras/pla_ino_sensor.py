@@ -41,8 +41,12 @@ class PLA_INO_Sensor:
         self.write_queue = []
         self._failed_connection_attempts = 0
         self._first_connect = True
+        #this should be thrown away!
         self.debug_dictionaries = [None]
         self.read_from_board_outs = [None]
+        #
+        self.last_debug_timestamp = self.reactor.monotonic()
+        self.last_debug_message = ""
 
         self.printer.register_event_handler("klippy:connect", self._handle_connect)
         self.printer.register_event_handler(
@@ -175,6 +179,8 @@ class PLA_INO_Sensor:
     def get_status(self, _):
         return {
             "temperature": round(self.temp, 2),
+            "last_debug_timestamp": self.last_debug_timestamp,
+            "last_debug_message": self.last_debug_message
         }
 
     ### INO specifics
@@ -285,7 +291,8 @@ class PLA_INO_Sensor:
                 break
 
         # logging.info(f"J: Read queue contents: {self.read_queue}")
-
+        
+        self.last_debug_timestamp = self.reactor.monotonic()
         self._process_read_queue()
         return eventtime + SERIAL_TIMER
 
@@ -497,6 +504,8 @@ class PLA_INO_Sensor:
                 for pair in pairs:
                     key, value = pair.split(":")
                     debug_dictionary[key.strip()] = value.strip()
+
+                self.last_debug_message = ",".join([str(i) for i in debug_dictionary.values()])
 
                 self.temp = int(debug_dictionary["T_a"]) / 100
 
