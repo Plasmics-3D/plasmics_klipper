@@ -65,6 +65,16 @@ class HarvestKlipper:
                     f"{self.print_job_id}_toolheadposition_{0}.csv",
                 ),
             },
+            "ino": {
+                "counter": 0,
+                "batch": [],
+                "batch_counter": 0,
+                "last": None,
+                "file_path": os.path.join(
+                    OUTPUT_PATH,
+                    f"{self.print_job_id}_ino_{0}.csv",
+                ),
+            },
         }
 
         self.all_batch_names = list(self.batches.keys())
@@ -86,9 +96,10 @@ class HarvestKlipper:
             logging.info(f"Error starting {script_name}: {e}")
 
         # get the calculated position of the printer every get_position_time_delta ms
-        self.timer = self.reactor.register_timer(
+        self.printer_position_timer = self.reactor.register_timer(
             self._get_printer_position, self.reactor.NOW
         )
+        
 
     def get_status(self, eventtime) -> dict:
         """This function is present in most modules and allows to read out the status of this module
