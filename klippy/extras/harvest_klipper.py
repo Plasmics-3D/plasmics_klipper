@@ -30,6 +30,7 @@ class HarvestKlipper:
         self.gcode = self.printer.lookup_object("gcode")
         self.motion_report = self.printer.lookup_object("motion_report")
         self.virtual_sdcard = self.printer.lookup_object("virtual_sdcard")
+        self.ino_sensors = []
 
         _ = config.get("serial", "")
         self.get_position_time_delta = config.getfloat("get_position_time_delta", 0.1)
@@ -124,8 +125,8 @@ class HarvestKlipper:
     def _connect(self)->None:
         """Upon connect, get the available INO sensors
         """
-        self.ino_sensors = self.printer.lookup_objects("pla_ino_sensor")
-        logging.info(f"J: INO SENSOR REGISTERED {self.ino_sensors}")
+        self.ino_sensors = [i[1] for i in self.printer.lookup_objects("pla_ino_sensor") if i[1] is not None]
+        logging.info(f"J: INO sensor registered: {self.ino_sensors}")
 
 
     def _respond_raw(self, msg: str) -> None:
@@ -223,7 +224,7 @@ class HarvestKlipper:
                 #     f"J: Harvest-klipper: timestamp: {self.reactor.monotonic()},{eventtime},{self.motion_report.get_status(eventtime)}"
                 # )
                 status = self.motion_report.get_status(eventtime)
-                line = f"{eventtime},{status['live_position']},{status['live_velocity']},{status['live_extruder_velocity']}"
+                line = f"{status['live_position']},{status['live_velocity']},{status['live_extruder_velocity']}"
                 self.add_to_batch(batch_name="toolheadposition", entry=line)
             except Exception as e:
                 logging.error(f"J: Harvest-klipper printer position ERROR: {e}")
@@ -231,16 +232,15 @@ class HarvestKlipper:
     
     def _get_ino(self, eventtime):
         if self.virtual_sdcard.is_active():
-            logging.info("J: GET INO")
-            # try:
-            #     # logging.info(
-            #     #     f"J: Harvest-klipper: timestamp: {self.reactor.monotonic()},{eventtime},{self.motion_report.get_status(eventtime)}"
-            #     # )
-            #     status = self.motion_report.get_status(eventtime)
-            #     line = f"{eventtime},{status['live_position']},{status['live_velocity']},{status['live_extruder_velocity']}"
-            #     self.add_to_batch(batch_name="toolheadposition", entry=line)
-            # except Exception as e:
-            #     logging.error(f"J: Harvest-klipper printer position ERROR: {e}")
+            for i in self.ino_sensors:
+                try:
+                    status = i.get_status(eventtime)
+                    line = f"{status['last_debug_timestamp']},{status['last_debug_message']}"
+                    self.add_to_batch(batch_name="ino", entry=line)
+
+                    # logging.info(f"J: INO readout: {eventtime},{status['last_debug_timestamp']},{status['last_debug_message']}")
+                except Exception as e:
+                    logging.error(f"J: Harvest-klipper ino ERROR: {e}")
         return eventtime + self.get_position_time_delta
 
 
