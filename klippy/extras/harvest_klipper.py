@@ -30,14 +30,13 @@ class HarvestKlipper:
         self.gcode = self.printer.lookup_object("gcode")
         self.motion_report = self.printer.lookup_object("motion_report")
         self.virtual_sdcard = self.printer.lookup_object("virtual_sdcard")
-        self.ino_sensors = self.printer.lookup_objects("pla_ino_sensor")
-        logging.info(f"J: INO SENSOR REGISTERED {self.ino_sensors}")
 
         _ = config.get("serial", "")
         self.get_position_time_delta = config.getfloat("get_position_time_delta", 0.1)
-        self.get_ino_time_delta = config.getfloat("get_position_time_delta", 0.1)
+        self.get_ino_time_delta = config.getfloat("get_ino_time_delta", 0.1)
 
         self.gcode.register_output_handler(self._respond_raw)
+        self.printer.register_event_handler("klippy:connect", self._connect)
         self.printer.register_event_handler("klippy:shutdown", self._handle_shutdown)
         self.printer.register_event_handler("klippy:disconnect", self._handle_shutdown)
 
@@ -121,6 +120,13 @@ class HarvestKlipper:
             "eventtime": eventtime,
             "current_print_id": self.print_job_id,
         }
+    
+    def _connect(self)->None:
+        """Upon connect, get the available INO sensors
+        """
+        self.ino_sensors = self.printer.lookup_objects("pla_ino_sensor")
+        logging.info(f"J: INO SENSOR REGISTERED {self.ino_sensors}")
+
 
     def _respond_raw(self, msg: str) -> None:
         """Script that is triggered if the gcode object sends out a message. If a file is done printing, the
