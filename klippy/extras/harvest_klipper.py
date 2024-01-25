@@ -225,7 +225,10 @@ class HarvestKlipper:
                 #     f"J: Harvest-klipper: timestamp: {self.reactor.monotonic()},{eventtime},{self.motion_report.get_status(eventtime)}"
                 # )
                 status = self.motion_report.get_status(eventtime)
-                line = f"{eventtime},{status['live_position']},{status['live_velocity']},{status['live_extruder_velocity']}"
+                current_position = ",".join(
+                    [str(round(i, 3)) for i in list(status["live_position"])]
+                )
+                line = f"{eventtime},{current_position},{status['live_velocity']},{status['live_extruder_velocity']}"
                 self.add_to_batch(batch_name="toolheadposition", entry=line)
             except Exception as e:
                 logging.error(f"J: Harvest-klipper printer position ERROR: {e}")
