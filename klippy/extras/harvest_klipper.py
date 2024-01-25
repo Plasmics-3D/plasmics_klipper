@@ -212,9 +212,7 @@ class HarvestKlipper:
         else:
             current_batch["last"] = entry
             current_batch["counter"] += 1
-            current_batch["batch"].append(
-                f"{current_batch['counter']},{self.reactor.monotonic()},{entry}\n"
-            )
+            current_batch["batch"].append(f"{current_batch['counter']},{entry}\n")
             if len(current_batch["batch"]) >= 1000:
                 self._write_batch_to_file(batch_name=batch_name)
 
