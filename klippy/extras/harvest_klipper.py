@@ -226,7 +226,7 @@ class HarvestKlipper:
                 current_position = ",".join(
                     [str(round(i, 3)) for i in list(status["live_position"])]
                 )
-                line = f"{round(eventtime,3)},{current_position},{status['live_velocity']},{status['live_extruder_velocity']}"
+                line = f"{round(eventtime,3)},{current_position},{round(status['live_velocity'],3)},{round(status['live_extruder_velocity'],3)}"
                 self.add_to_batch(batch_name="toolheadposition", entry=line)
             except Exception as e:
                 logging.error(f"J: Harvest-klipper printer position ERROR: {e}")
