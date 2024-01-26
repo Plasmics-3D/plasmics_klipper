@@ -226,7 +226,7 @@ class HarvestKlipper:
                 current_position = ",".join(
                     [str(round(i, 3)) for i in list(status["live_position"])]
                 )
-                line = f"{round(eventtime,3)},{current_position},{round(status['live_velocity'],3)},{round(status['live_extruder_velocity'],3)}"
+                line = f"{round(eventtime,5)},{current_position},{round(status['live_velocity'],3)},{round(status['live_extruder_velocity'],3)}"
                 self.add_to_batch(batch_name="toolheadposition", entry=line)
             except Exception as e:
                 logging.error(f"J: Harvest-klipper printer position ERROR: {e}")
@@ -237,7 +237,7 @@ class HarvestKlipper:
             for i in self.ino_sensors:
                 try:
                     status = i.get_status(eventtime)
-                    line = f"{round(status['last_debug_timestamp'],3)},{status['last_debug_message']}"
+                    line = f"{round(status['last_debug_timestamp'],5)},{status['last_debug_message']}"
                     self.add_to_batch(batch_name="ino", entry=line)
 
                     # logging.info(f"J: INO readout: {eventtime},{status['last_debug_timestamp']},{status['last_debug_message']}")
