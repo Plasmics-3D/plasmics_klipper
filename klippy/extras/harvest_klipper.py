@@ -237,7 +237,7 @@ class HarvestKlipper:
             for i in self.ino_sensors:
                 try:
                     status = i.get_status(eventtime)
-                    line = f"{round(status['last_debug_timestamp'],5)},{status['last_debug_message']}"
+                    line = f"{round(eventtime,5)},{round(status['last_debug_timestamp'],5)},{status['last_debug_message']}"
                     self.add_to_batch(batch_name="ino", entry=line)
 
                     # logging.info(f"J: INO readout: {eventtime},{status['last_debug_timestamp']},{status['last_debug_message']}")
