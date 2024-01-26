@@ -177,7 +177,7 @@ class GCodeDispatch:
         for line in commands:
             ### This is the code snippet necessary to collect gcode info!
             if "harvest_klipper" in self.printer.objects:
-                self.printer.lookup_object("harvest_klipper").add_to_batch(batch_name = "gcode", entry=f"{round(self.reactor.monotonic(),5)},{line}")
+                self.printer.lookup_object("harvest_klipper").add_to_batch(batch_name = "gcode", entry=f"{round(self.reactor.monotonic(),8)},{line}")
             ###
             # Ignore comments and leading/trailing spaces
             line = origline = line.strip()
