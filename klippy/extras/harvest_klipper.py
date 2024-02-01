@@ -28,7 +28,7 @@ class HarvestKlipper:
         self.printer = config.get_printer()
         self.reactor = self.printer.get_reactor()
         self.gcode = self.printer.lookup_object("gcode")
-        self.motion_report = self.printer.lookup_object("motion_report")
+        self.motion_report = self.printer.load_object(config, 'motion_report')
         self.virtual_sdcard = self.printer.lookup_object("virtual_sdcard")
         self.ino_sensors = []
 
