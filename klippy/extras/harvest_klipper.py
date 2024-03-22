@@ -28,7 +28,7 @@ class HarvestKlipper:
         self.printer = config.get_printer()
         self.reactor = self.printer.get_reactor()
         self.gcode = self.printer.lookup_object("gcode")
-        self.motion_report = self.printer.load_object(config, 'motion_report')
+        self.motion_report = self.printer.load_object(config, "motion_report")
         self.virtual_sdcard = self.printer.lookup_object("virtual_sdcard")
         self.ino_sensors = []
 
@@ -44,7 +44,8 @@ class HarvestKlipper:
         if not os.path.exists("/home/pi/harvest"):
             raise ValueError("harvest not installed - no data collection possible!")
         self._create_output_folder()
-        self.print_job_id = "NO_ID_KLIPPER"
+        self.print_job_id = self._rename_for_bucket("NO_ID_KLIPPER")
+
         self.new_print_job_flag = False
 
         self.batches = {
@@ -105,6 +106,18 @@ class HarvestKlipper:
 
         self.ino_timer = self.reactor.register_timer(self._get_ino, self.reactor.NOW)
 
+    def _rename_for_bucket(self, name):
+        """
+        Corrects the bucket name to be lowercase and without spaces or dots, according to GCP naming conventions.
+
+        :param bucket_name: Name of the bucket to retrieve or create.
+        :return: Corrected bucket name.
+        """
+        name = name.lower().replace(" ", "_")
+        name = name.replace(".", "_")
+
+        return name
+
     def get_status(self, eventtime) -> dict:
         """This function is present in most modules and allows to read out the status of this module
         over different queries. Needed for passing down the print job id to harvest
@@ -150,7 +163,9 @@ class HarvestKlipper:
     def _print_start_processing(self, line):
         if "SDCARD_PRINT_FILE" in line:
             tmp = line.split("FILENAME=")[1].replace('"', "")
-            self.print_job_id = f"{tmp}_{self.reactor.monotonic()}_{random.randint(100000000,999999999)}"
+            self.print_job_id = self._rename_for_bucket(
+                f"{tmp}_{self.reactor.monotonic()}_{random.randint(100000000,999999999)}"
+            )
             self.new_print_job_flag = True
         else:
             self.new_print_job_flag = False
