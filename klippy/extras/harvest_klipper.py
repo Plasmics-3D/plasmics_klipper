@@ -11,6 +11,7 @@ sys.path.append("/home/pi/harvest")
 from shutdown_object import ShutdownObject
 
 OUTPUT_PATH = "/home/pi/harvest/output"
+STANDARD_ID = "NO_ID_HARVEST"
 
 
 class HarvestKlipper:
@@ -44,7 +45,7 @@ class HarvestKlipper:
         if not os.path.exists("/home/pi/harvest"):
             raise ValueError("harvest not installed - no data collection possible!")
         self._create_output_folder()
-        self.print_job_id = self._rename_for_bucket("NO_ID_KLIPPER")
+        self.print_job_id = self._rename_for_bucket(STANDARD_ID)
 
         self.new_print_job_flag = False
 
@@ -100,6 +101,10 @@ class HarvestKlipper:
             logging.info(f"Error starting {script_name}: {e}")
 
         # get the calculated position of the printer every get_position_time_delta ms
+        self.printer_id_timer = self.reactor.register_timer(
+            self._correct_printer_id_while_not_printing, self.reactor.NOW
+        )
+
         self.printer_position_timer = self.reactor.register_timer(
             self._get_printer_position, self.reactor.NOW
         )
@@ -230,6 +235,15 @@ class HarvestKlipper:
             current_batch["batch"].append(f"{current_batch['counter']},{entry}\n")
             if len(current_batch["batch"]) >= 1000:
                 self._write_batch_to_file(batch_name=batch_name)
+
+    def _correct_printer_id_while_not_printing(self, eventtime):
+        if not self.virtual_sdcard.is_active():
+            self.print_job_id = STANDARD_ID
+            self.new_print_job_flag = True
+        else:
+            self.new_print_job_flag = False
+        return eventtime + self.get_position_time_delta
+
 
     def _get_printer_position(self, eventtime):
         if self.virtual_sdcard.is_active():
