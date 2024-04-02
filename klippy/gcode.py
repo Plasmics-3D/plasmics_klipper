@@ -92,6 +92,7 @@ class GCodeDispatch:
     def __init__(self, printer):
         self.printer = printer
         self.is_fileinput = not not printer.get_start_args().get("debuginput")
+        self.reactor = self.printer.get_reactor()
         printer.register_event_handler("klippy:ready", self._handle_ready)
         printer.register_event_handler("klippy:shutdown", self._handle_shutdown)
         printer.register_event_handler("klippy:disconnect",
@@ -187,6 +188,10 @@ class GCodeDispatch:
     args_r = re.compile('([A-Z_]+|[A-Z*/])')
     def _process_commands(self, commands, need_ack=True):
         for line in commands:
+            ### This is the code snippet necessary to collect gcode info!
+            if "harvest_klipper" in self.printer.objects:
+                self.printer.lookup_object("harvest_klipper").add_to_batch(batch_name = "gcode", entry=f"{round(self.reactor.monotonic(),8)},{line}")
+            ###
             # Ignore comments and leading/trailing spaces
             line = origline = line.strip()
             cpos = line.find(';')
@@ -206,6 +211,7 @@ class GCodeDispatch:
                        for i in range(1, numparts, 2) }
             gcmd = GCodeCommand(self, cmd, origline, params, need_ack)
             # Invoke handler for command
+            logging.info(f"JTIMINGTEST: gcode: {self.reactor.monotonic()} gcode command {origline}")
             handler = self.gcode_handlers.get(cmd, self.cmd_default)
             try:
                 handler(gcmd)

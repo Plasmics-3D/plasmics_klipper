@@ -203,8 +203,9 @@ class PrinterMotionReport:
         self.printer.get_reactor().register_callback(self._dump_shutdown)
     # Status reporting
     def get_status(self, eventtime):
-        if eventtime < self.next_status_time or not self.trapqs:
-            return self.last_status
+        # if eventtime < self.next_status_time or not self.trapqs:
+        #     logging.info(f"J: motion_report, get_status: {self.last_status}")
+        #     return self.last_status
         self.next_status_time = eventtime + STATUS_REFRESH_TIME
         xyzpos = (0., 0., 0.)
         epos = (0.,)
