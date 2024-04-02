@@ -4,7 +4,7 @@
 
 # Installation and Configuration Guide
 
-This will guide you through the setup of the Ino Trident for Klipper. It will replace your current Klipper Version with ours and can still be updated with the moonraker update manager. 
+This will guide you through the setup of the Ino Trident for Klipper. It will replace your current Klipper Version with ours. 
 
 
 ## Step 1: Install the Custom Klipper Version
@@ -14,7 +14,8 @@ This will guide you through the setup of the Ino Trident for Klipper. It will re
 
 ```bash
 rm -rf ~/klipper
-cd ~/ && git clone git@github.com:Plasmics-3D/klipper.git
+cd ~/ && git clone https://github.com/Plasmics-3D/klipper_ino.git
+mv klipper_ino/ klipper/
 ```
 
 3. Run the following command to identify the USB serial port:
@@ -33,7 +34,6 @@ Open your `printer.cfg` and make the following changes:
 
 ```python
 [extruder] 
-heater_pin: PC12  # Unused pin as placeholder
 sensor_type: PLA_INO_SENSOR
 heater_type: PLA_INO
 control: pid
