@@ -48,6 +48,7 @@ class HarvestKlipper:
         self.print_job_id = self._rename_for_bucket(STANDARD_ID)
 
         self.new_print_job_flag = False
+        self.layer_counter = 0
 
         self.batches = {
             "gcode": {
@@ -55,6 +56,7 @@ class HarvestKlipper:
                 "batch": [],
                 "batch_counter": 0,
                 "last": None,
+                "last_timestamp": self.reactor.monotonic(),
                 "file_path": os.path.join(
                     OUTPUT_PATH,
                     f"{self.print_job_id}_gcode_{0}.csv",
@@ -65,6 +67,7 @@ class HarvestKlipper:
                 "batch": [],
                 "batch_counter": 0,
                 "last": None,
+                "last_timestamp": self.reactor.monotonic(),
                 "file_path": os.path.join(
                     OUTPUT_PATH,
                     f"{self.print_job_id}_toolheadposition_{0}.csv",
@@ -75,6 +78,7 @@ class HarvestKlipper:
                 "batch": [],
                 "batch_counter": 0,
                 "last": None,
+                "last_timestamp": self.reactor.monotonic(),
                 "file_path": os.path.join(
                     OUTPUT_PATH,
                     f"{self.print_job_id}_ino_{0}.csv",
@@ -135,6 +139,10 @@ class HarvestKlipper:
         return {
             "eventtime": eventtime,
             "current_print_id": self.print_job_id,
+            "time_since_last_gcode": self.reactor.monotonic()
+            - self.batches["gcode"]["last_timestamp"],
+            "last_gcode_line": self.batches["gcode"]["last"],
+            "current_layer_nr": self.layer_counter,
         }
 
     def _connect(self) -> None:
@@ -167,6 +175,7 @@ class HarvestKlipper:
 
     def _print_start_processing(self, line):
         if "SDCARD_PRINT_FILE" in line:
+            self.layer_counter = 0
             tmp = line.split("FILENAME=")[1].replace('"', "")
             self.print_job_id = self._rename_for_bucket(
                 f"{tmp}_{self.reactor.monotonic()}_{random.randint(100000000,999999999)}"
@@ -174,6 +183,8 @@ class HarvestKlipper:
             self.new_print_job_flag = True
         else:
             self.new_print_job_flag = False
+        if ";LAYER_CHANGE" in line:
+            self.layer_counter += 1
 
     def _create_output_folder(self) -> None:
         """If the destination for storing the batch information is not existing yet, creat the respective folder"""
@@ -219,6 +230,7 @@ class HarvestKlipper:
                 current_batch = self.batches[i]
                 self._write_batch_to_file(batch_name=i)
                 current_batch["last"] = ""
+                current_batch["last_timestamp"] = self.reactor.monotonic()
                 current_batch["counter"] = 0
                 current_batch["batch_counter"] = 0
                 current_batch["file_path"] = os.path.join(
@@ -231,6 +243,7 @@ class HarvestKlipper:
             logging.error(f"J: Harvest-klipper printer position ERROR: {e}")
         else:
             current_batch["last"] = entry
+            current_batch["last_timestamp"] = self.reactor.monotonic()
             current_batch["counter"] += 1
             current_batch["batch"].append(f"{current_batch['counter']},{entry}\n")
             if len(current_batch["batch"]) >= 1000:
@@ -243,7 +256,6 @@ class HarvestKlipper:
         else:
             self.new_print_job_flag = False
         return eventtime + self.get_position_time_delta
-
 
     def _get_printer_position(self, eventtime):
         if self.virtual_sdcard.is_active():
