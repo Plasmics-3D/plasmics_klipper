@@ -44,7 +44,7 @@ class HarvestKlipper:
         if not os.path.exists("/home/pi/harvest"):
             raise ValueError("harvest not installed - no data collection possible!")
         self._create_output_folder()
-
+        self.print_job_id = STANDARD_ID
         self.new_print_job_flag = False
         self.layer_counter = 0
 
