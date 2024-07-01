@@ -169,6 +169,10 @@ class HarvestKlipper:
             except Exception as e:
                 logging.error(f"J: Harvest-klipper: {e}")
                 self.print_job_id = STANDARD_ID
+            else:
+                logging.info(
+                    f"J: Harvest-klipper: new print job started with id: {self.print_job_id}"
+                )
             self.new_print_job_flag = True
         else:
             self.new_print_job_flag = False
