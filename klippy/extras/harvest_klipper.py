@@ -163,7 +163,9 @@ class HarvestKlipper:
         if "SDCARD_PRINT_FILE" in line:
             self.layer_counter = 0
             try:
-                with open("~/runnerState.json", "r") as f:
+                with open(
+                    os.path.join(os.path.expanduser("~"), "runnerState.json"), "r"
+                ) as f:
                     data = json.load(f)
                     self.print_job_id = data["currentPrintJobSort"]
             except Exception as e:
