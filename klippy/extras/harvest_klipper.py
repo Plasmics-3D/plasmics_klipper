@@ -1,10 +1,9 @@
 import logging
 import os
-import importlib
-import threading
 import sys
 import subprocess
 import random
+import json
 
 # setting path
 sys.path.append("/home/pi/harvest")
@@ -45,7 +44,6 @@ class HarvestKlipper:
         if not os.path.exists("/home/pi/harvest"):
             raise ValueError("harvest not installed - no data collection possible!")
         self._create_output_folder()
-        self.print_job_id = self._rename_for_bucket(STANDARD_ID)
 
         self.new_print_job_flag = False
         self.layer_counter = 0
@@ -115,18 +113,6 @@ class HarvestKlipper:
 
         self.ino_timer = self.reactor.register_timer(self._get_ino, self.reactor.NOW)
 
-    def _rename_for_bucket(self, name):
-        """
-        Corrects the bucket name to be lowercase and without spaces or dots, according to GCP naming conventions.
-
-        :param bucket_name: Name of the bucket to retrieve or create.
-        :return: Corrected bucket name.
-        """
-        name = name.lower().replace(" ", "_")
-        name = name.replace(".", "_")
-
-        return name
-
     def get_status(self, eventtime) -> dict:
         """This function is present in most modules and allows to read out the status of this module
         over different queries. Needed for passing down the print job id to harvest
@@ -176,10 +162,13 @@ class HarvestKlipper:
     def _print_start_processing(self, line):
         if "SDCARD_PRINT_FILE" in line:
             self.layer_counter = 0
-            tmp = line.split("FILENAME=")[1].replace('"', "")
-            self.print_job_id = self._rename_for_bucket(
-                f"{tmp}_{self.reactor.monotonic()}_{random.randint(100000000,999999999)}"
-            )
+            try:
+                with open("~/runnerState.json", "r") as f:
+                    data = json.load(f)
+                    self.print_job_id = data["currentPrintJobSort"]
+            except Exception as e:
+                logging.error(f"J: Harvest-klipper: {e}")
+                self.print_job_id = STANDARD_ID
             self.new_print_job_flag = True
         else:
             self.new_print_job_flag = False
