@@ -82,9 +82,8 @@ class HarvestKlipper:
 
         elif "MOVE_TYPE 2" in line:
             self.status_object["take_snapshot"] = True
-        else "MOVE_TYPE" in line:
+        elif "MOVE_TYPE" in line:
             self.status_object["take_snapshot"] = False
-        
 
         self.status_object["current_gcode_line"] = line
         self.status_object["current_gcode_position"] = self.gcode_counter
