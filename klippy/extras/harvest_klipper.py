@@ -25,8 +25,6 @@ class HarvestKlipper:
         self.motion_report = self.printer.load_object(config, "motion_report")
         self.virtual_sdcard = self.printer.lookup_object("virtual_sdcard")
 
-        _ = config.get("serial", "")
-
         self.print_job_id = STANDARD_ID
         self.new_print_job_flag = False
         self.layer_counter = 0
@@ -43,9 +41,7 @@ class HarvestKlipper:
         return {
             "eventtime": eventtime,
             "current_print_id": self.print_job_id,
-            "time_since_last_gcode": self.reactor.monotonic()
-            - self.batches["gcode"]["last_timestamp"],
-            "last_gcode_line": self.batches["gcode"]["last"],
+            "current_time": self.reactor.monotonic(),
             "current_layer_nr": self.layer_counter,
         }
 
