@@ -90,7 +90,7 @@ class HarvestKlipper:
             self.status_object["current_time"]
         )
         self.gcode_counter += 1
-        logging.info(f"J: Harvest-klipper: {self.status_object}")
+        # logging.info(f"J: Harvest-klipper: {self.status_object}")
 
     def _get_printer_position(self, eventtime):
         if self.virtual_sdcard.is_active():
