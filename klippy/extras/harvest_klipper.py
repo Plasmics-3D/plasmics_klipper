@@ -18,16 +18,24 @@ class HarvestKlipper:
         :raises ValueError: If the harvest folder is not available (i.e. the repository is not present or installed in a wrong location) an error is raised
         - this should avoid useless collection of data with no way of matching it with other data.
         """
+        self.standard_status_object = {
+            "eventtime": 0,
+            "current_print_id": STANDARD_ID,
+            "print_start_time": 0,
+            "current_time": 0,
+            "current_layer_nr": 0,
+            "current_gcode_line": "",
+            "current_gcode_position": 0,
+            "current_toolhead_position": 0,
+        }
         logging.info("J: Harvest-klipper initiated!")
         self.printer = config.get_printer()
         self.reactor = self.printer.get_reactor()
         self.gcode = self.printer.lookup_object("gcode")
         self.motion_report = self.printer.load_object(config, "motion_report")
         self.virtual_sdcard = self.printer.lookup_object("virtual_sdcard")
-
-        self.print_job_id = STANDARD_ID
-        self.new_print_job_flag = False
-        self.layer_counter = 0
+        self.status_object = self.standard_status_object.copy()
+        self.gcode_counter = 0
 
     def get_status(self, eventtime) -> dict:
         """This function is present in most modules and allows to read out the status of this module
@@ -38,12 +46,8 @@ class HarvestKlipper:
         :return: Dictionary of the eventtime, and the name of this module (as a placeholder)
         :rtype: dict
         """
-        return {
-            "eventtime": eventtime,
-            "current_print_id": self.print_job_id,
-            "current_time": self.reactor.monotonic(),
-            "current_layer_nr": self.layer_counter,
-        }
+        self.status_object["eventtime"] = eventtime
+        return self.status_object
 
     def process_gcode(self, line):
         """Processes the gcode line and triggers the _print_start_processing function
@@ -51,51 +55,33 @@ class HarvestKlipper:
         :param line: The gcode line that is to be processed
         :type line: str
         """
-        logging.info(f"J: Harvest-klipper process gcode triggered with {line}")
-        # self._print_start_processing(line)
-
-    def _respond_raw(self, msg: str) -> None:
-        """Script that is triggered if the gcode object sends out a message. If a file is done printing, the
-        batch information that is still in the buffer will be stored to a file.
-
-        :param msg: the message sent out by the gcode object
-        :type msg: str
-        """
-        # logging.info(f"J: Harvest-klipper respond raw triggered with {msg}")
-        if msg == "Done printing file":
-            logging.info(f"J: Harvest-klipper done - write last batch")
-            for i in self.all_batch_names:
-                self._write_batch_to_file(batch_name=i)
-
-    def _print_start_processing(self, line):
         if "SDCARD_PRINT_FILE" in line:
-            self.layer_counter = 0
+            self.gcode_counter = 0
+            # reset the status object
+            self.status_object = self.standard_status_object.copy()
             try:
                 with open(
                     os.path.join(os.path.expanduser("~"), "runnerState.json"), "r"
                 ) as f:
                     data = json.load(f)
-                    self.print_job_id = data["currentPrintJobSort"]
+                    self.status_object["current_print_id"] = data["currentPrintJobSort"]
             except Exception as e:
                 logging.error(f"J: Harvest-klipper: {e}")
-                self.print_job_id = STANDARD_ID
             else:
                 logging.info(
-                    f"J: Harvest-klipper: new print job started with id: {self.print_job_id}"
+                    f"Harvest-klipper: new print job started with id: {self.status_object['current_print_id']}"
                 )
-            self.new_print_job_flag = True
-        else:
-            self.new_print_job_flag = False
-        if ";LAYER_CHANGE" in line:
-            self.layer_counter += 1
+            self.status_object["print_start_time"] = self.reactor.monotonic()
+        elif ";LAYER:" in line:
+            self.status_object["current_layer_nr"] = int(line.split(":")[1])
 
-    def _correct_printer_id_while_not_printing(self, eventtime):
-        if not self.virtual_sdcard.is_active():
-            self.print_job_id = STANDARD_ID
-            self.new_print_job_flag = True
-        else:
-            self.new_print_job_flag = False
-        return eventtime + self.get_position_time_delta
+        self.status_object["current_gcode_line"] = line
+        self.status_object["current_gcode_position"] = self.gcode_counter
+        self.status_object["current_time"] = self.reactor.monotonic()
+        self.status_object["current_toolhead_position"] = self._get_printer_position(
+            self.status_object["current_time"]
+        )
+        self.gcode_counter += 1
 
     def _get_printer_position(self, eventtime):
         if self.virtual_sdcard.is_active():
