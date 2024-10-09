@@ -24,7 +24,6 @@ class HarvestKlipper:
             "current_time": 0,
             "current_layer_nr": 0,
             "current_gcode_line": "",
-            "current_gcode_position": 0,
             "current_toolhead_position": 0,
             "current_section": "",
             "take_snapshot": False,
@@ -86,7 +85,6 @@ class HarvestKlipper:
             self.status_object["take_snapshot"] = False
 
         self.status_object["current_gcode_line"] = line
-        self.status_object["current_gcode_position"] = self.gcode_counter
         self.status_object["current_time"] = self.reactor.monotonic()
         self.status_object["current_toolhead_position"] = self._get_printer_position(
             self.status_object["current_time"]
