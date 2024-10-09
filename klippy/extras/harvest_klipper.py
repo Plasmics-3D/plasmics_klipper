@@ -13,7 +13,6 @@ class HarvestKlipper:
 
     def __init__(self, config):
         """Sets up the module and starts the harvest_main.py script (if possible)
-
         :param config: contains the information from the config file for the 'harvest_klipper' section
         :type config: ?
         :raises ValueError: If the harvest folder is not available (i.e. the repository is not present or installed in a wrong location) an error is raised
@@ -31,14 +30,6 @@ class HarvestKlipper:
         self.print_job_id = STANDARD_ID
         self.new_print_job_flag = False
         self.layer_counter = 0
-
-        self.printer_id_timer = self.reactor.register_timer(
-            self._correct_printer_id_while_not_printing, self.reactor.NOW
-        )
-
-        self.printer_position_timer = self.reactor.register_timer(
-            self._get_printer_position, self.reactor.NOW
-        )
 
     def get_status(self, eventtime) -> dict:
         """This function is present in most modules and allows to read out the status of this module
