@@ -93,6 +93,9 @@ class HarvestKlipper:
                 line = f"{round(eventtime,5)},{current_position},{round(status['live_velocity'],3)},{round(status['live_extruder_velocity'],3)}"
             except Exception as e:
                 logging.error(f"J: Harvest-klipper printer position ERROR: {e}")
+                line = f"{round(eventtime,5)},0,0,0,0,0"
+        else:
+            line = f"{round(eventtime,5)},0,0,0,0,0"
         return line
 
 
