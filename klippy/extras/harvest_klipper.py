@@ -5,8 +5,6 @@ import subprocess
 import random
 import json
 
-STANDARD_ID = "NO_ID_HARVEST"
-
 
 class HarvestKlipper:
     """Custom module used to collect information about gcode and other klipper-related information (refer to the diagram contained in the harvest repository for more information on this)."""
@@ -20,7 +18,8 @@ class HarvestKlipper:
         """
         self.standard_status_object = {
             "eventtime": 0,
-            "current_print_id": STANDARD_ID,
+            "current_print_id": "",
+            "filename": "",
             "print_start_time": 0,
             "current_time": 0,
             "current_layer_nr": 0,
@@ -73,6 +72,7 @@ class HarvestKlipper:
                 logging.info(
                     f"Harvest-klipper: new print job started with id: {self.status_object['current_print_id']}"
                 )
+            self.status_object["filename"] = line.split("FILENAME=")[1]
             self.status_object["print_start_time"] = self.reactor.monotonic()
         elif ";LAYER:" in line:
             self.status_object["current_layer_nr"] = int(line.split(":")[1])
