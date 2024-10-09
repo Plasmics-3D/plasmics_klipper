@@ -27,6 +27,8 @@ class HarvestKlipper:
             "current_gcode_line": "",
             "current_gcode_position": 0,
             "current_toolhead_position": 0,
+            "current_section": "",
+            "take_snapshot": False,
         }
         logging.info("J: Harvest-klipper initiated!")
         self.printer = config.get_printer()
@@ -75,6 +77,15 @@ class HarvestKlipper:
         elif ";LAYER:" in line:
             self.status_object["current_layer_nr"] = int(line.split(":")[1])
 
+        elif ";SECTION:" in line:
+            self.status_object["current_section"] = line.split(":")[1]
+
+        elif "MOVE_TYPE 2" in line:
+            self.status_object["take_snapshot"] = True
+        else "MOVE_TYPE" in line:
+            self.status_object["take_snapshot"] = False
+        
+
         self.status_object["current_gcode_line"] = line
         self.status_object["current_gcode_position"] = self.gcode_counter
         self.status_object["current_time"] = self.reactor.monotonic()
@@ -82,6 +93,7 @@ class HarvestKlipper:
             self.status_object["current_time"]
         )
         self.gcode_counter += 1
+        logging.info(f"J: Harvest-klipper: {self.status_object}")
 
     def _get_printer_position(self, eventtime):
         if self.virtual_sdcard.is_active():
@@ -93,9 +105,9 @@ class HarvestKlipper:
                 line = f"{round(eventtime,5)},{current_position},{round(status['live_velocity'],3)},{round(status['live_extruder_velocity'],3)}"
             except Exception as e:
                 logging.error(f"J: Harvest-klipper printer position ERROR: {e}")
-                line = f"{round(eventtime,5)},0,0,0,0,0"
+                line = f"no position"
         else:
-            line = f"{round(eventtime,5)},0,0,0,0,0"
+            line = f"no position"
         return line
 
 
