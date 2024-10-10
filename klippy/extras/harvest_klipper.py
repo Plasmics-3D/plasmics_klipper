@@ -47,6 +47,9 @@ class HarvestKlipper:
         :rtype: dict
         """
         self.status_object["eventtime"] = eventtime
+        self.status_object["current_toolhead_position"] = self._get_printer_position(
+            self.status_object["current_time"]
+        )
         return self.status_object
 
     def process_gcode(self, line):
@@ -86,9 +89,6 @@ class HarvestKlipper:
 
         self.status_object["current_gcode_line"] = line
         self.status_object["current_time"] = self.reactor.monotonic()
-        self.status_object["current_toolhead_position"] = self._get_printer_position(
-            self.status_object["current_time"]
-        )
         self.gcode_counter += 1
         # logging.info(f"J: Harvest-klipper: {self.status_object}")
 
