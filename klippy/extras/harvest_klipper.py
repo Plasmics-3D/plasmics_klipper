@@ -99,7 +99,7 @@ class HarvestKlipper:
                 current_position = ",".join(
                     [str(round(i, 3)) for i in list(status["live_position"])]
                 )
-                line = f"{round(eventtime,5)},{current_position},{round(status['live_velocity'],3)},{round(status['live_extruder_velocity'],3)}"
+                line = f"eventtime:{round(eventtime,5)},position:{current_position},velocity:{round(status['live_velocity'],3)},extruder_velocity:{round(status['live_extruder_velocity'],3)}"
             except Exception as e:
                 logging.error(f"J: Harvest-klipper printer position ERROR: {e}")
                 line = f"no position"
