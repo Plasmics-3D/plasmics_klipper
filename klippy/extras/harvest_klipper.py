@@ -48,7 +48,7 @@ class HarvestKlipper:
         """
         self.status_object["eventtime"] = eventtime
         self.status_object["current_toolhead_position"] = self._get_printer_position(
-            self.status_object["current_time"]
+            eventtime
         )
         return self.status_object
 
