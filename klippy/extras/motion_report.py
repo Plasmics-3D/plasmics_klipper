@@ -152,7 +152,7 @@ class DumpTrapQ:
         data = ffi_main.new("struct pull_move[1]")
         count = ffi_lib.trapq_extract_old(self.trapq, data, 1, 0.0, print_time)
         if not count:
-            return None, None
+            return None, None, None
         move = data[0]
         move_time = max(0.0, min(move.move_t, print_time - move.print_time))
         dist = (move.start_v + 0.5 * move.accel * move_time) * move_time
