@@ -384,7 +384,7 @@ class ToolHead:
         for move in moves:
             now = self.reactor.monotonic()
             logging.info(
-                f"JTIMINGTEST: toolhead: {now}, next_move_time: {next_move_time} move start:{move.start_pos} move end:{move.end_pos}, timings: {move.accel_t}, {move.cruise_t}, {move.decel_t}, {move.accel_t + move.cruise_t + move.decel_t}, velocity: {move.cruise_v}; MCU: {self.mcu.stats(now)}"
+                f"JTIMINGTEST: toolhead: {now}, next_move_time: {next_move_time} move start:{move.start_pos} move end:{move.end_pos}, timings: {move.accel_t}, {move.cruise_t}, {move.decel_t}, {move.accel_t + move.cruise_t + move.decel_t}, velocity: {move.cruise_v}"
             )
             if move.is_kinematic_move:
                 self.trapq_append(
