@@ -19,6 +19,7 @@ class ClockSync:
         self.queries_pending = 0
         self.mcu_freq = 1.0
         self.last_clock = 0
+        self.last_time = 0.0
         self.clock_est = (0.0, 0.0, 0.0)
         # Minimum round-trip-time tracking
         self.min_half_rtt = 999999999.9
@@ -73,6 +74,8 @@ class ClockSync:
         last_clock = self.last_clock
         clock_delta = (params["clock"] - last_clock) & 0xFFFFFFFF
         self.last_clock = clock = last_clock + clock_delta
+        self.last_time = self.reactor.monotonic()
+        logging.info(f"TIMINGTEST: {self.last_clock} {self.last_time}")
         # Check if this is the best round-trip-time seen so far
         sent_time = params["#sent_time"]
         if not sent_time:
