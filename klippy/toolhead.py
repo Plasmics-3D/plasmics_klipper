@@ -383,8 +383,9 @@ class ToolHead:
         next_move_time = self.print_time
         for move in moves:
             now = self.reactor.monotonic()
+            self.mcu._clocksync._get_clock_event(now)
             logging.info(
-                f"JTIMINGTEST: toolhead: {now}, next_move_time: {next_move_time} move start:{move.start_pos} move end:{move.end_pos}, timings: {move.accel_t}, {move.cruise_t}, {move.decel_t}, {move.accel_t + move.cruise_t + move.decel_t}, velocity: {move.cruise_v}"
+                f"JTIMINGTEST: toolhead: {now}, MCU_clock {self.mcu._clocksync.clock_est} {self.mcu._clocksync.clock_to_print_time(self.mcu._clocksync.last_clock)}  {self.mcu._clocksync.clock_to_print_time(self.mcu._clocksync.last_clock)}, next_move_time: {next_move_time} move start:{move.start_pos} move end:{move.end_pos}, timings: {move.accel_t}, {move.cruise_t}, {move.decel_t}, {move.accel_t + move.cruise_t + move.decel_t}, velocity: {move.cruise_v}; MCU: {self.mcu.stats(now)}"
             )
             if move.is_kinematic_move:
                 self.trapq_append(

@@ -68,7 +68,6 @@ class ClockSync:
         return eventtime + 0.9839
 
     def _handle_clock(self, params):
-        logging.info(f"JTIMINGTEST_handle_clock: {params}, {self.reactor.monotonic()}")
         self.queries_pending = 0
         # Extend clock to 64bit
         last_clock = self.last_clock
