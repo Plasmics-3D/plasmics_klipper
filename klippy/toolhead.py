@@ -325,6 +325,8 @@ class ToolHead:
         for module_name in modules:
             self.printer.load_object(config, module_name)
 
+        self.old_velocity = 0
+
     # Print time and flush tracking
     def _advance_flush_time(self, flush_time):
         flush_time = max(flush_time, self.last_flush_time)
@@ -382,11 +384,6 @@ class ToolHead:
         # Queue moves into trapezoid motion queue (trapq)
         next_move_time = self.print_time
         for move in moves:
-            now = self.reactor.monotonic()
-            self.mcu._clocksync._get_clock_event(now)
-            logging.info(
-                f"JTIMINGTEST: toolhead: {now}, MCU_clock {self.mcu._clocksync.clock_est} {self.mcu._clocksync.clock_to_print_time(self.mcu._clocksync.last_clock)}  {self.mcu._clocksync.clock_to_print_time(self.mcu._clocksync.last_clock)}, next_move_time: {next_move_time} move start:{move.start_pos} move end:{move.end_pos}, timings: {move.accel_t}, {move.cruise_t}, {move.decel_t}, {move.accel_t + move.cruise_t + move.decel_t}, velocity: {move.cruise_v}; MCU: {self.mcu.stats(now)}"
-            )
             if move.is_kinematic_move:
                 self.trapq_append(
                     self.trapq,
@@ -409,6 +406,15 @@ class ToolHead:
             next_move_time = (
                 next_move_time + move.accel_t + move.cruise_t + move.decel_t
             )
+
+            ###
+            if self.old_velocity != move.cruise_v:
+                self.old_velocity = move.cruise_v
+                now = self.reactor.monotonic()
+                self.mcu._clocksync._get_clock_event(now)
+                logging.info(
+                    f"JTIMINGTEST: toolhead: {now}, MCU_clock {self.mcu._clocksync.clock_est} {self.mcu._clocksync.clock_to_print_time(self.mcu._clocksync.last_clock)}  {self.mcu._clocksync.clock_to_print_time(self.mcu._clocksync.last_clock)}, next_move_time: {next_move_time}, velocity: {move.cruise_v}"
+                )
             for cb in move.timing_callbacks:
                 cb(next_move_time)
         # Generate steps for moves
