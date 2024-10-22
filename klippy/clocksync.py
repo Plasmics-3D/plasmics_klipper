@@ -74,10 +74,6 @@ class ClockSync:
         last_clock = self.last_clock
         clock_delta = (params["clock"] - last_clock) & 0xFFFFFFFF
         self.last_clock = clock = last_clock + clock_delta
-        self.last_time = self.reactor.monotonic()
-        logging.info(
-            f"TIMINGTEST: {self.clock_to_print_time(self.last_clock)} {self.last_time}"
-        )
         # Check if this is the best round-trip-time seen so far
         sent_time = params["#sent_time"]
         if not sent_time:
@@ -144,6 +140,9 @@ class ClockSync:
             clock,
         )
         self.clock_est = (self.time_avg + self.min_half_rtt, self.clock_avg, new_freq)
+
+        self.last_time = self.reactor.monotonic()
+        logging.info(f"TIMINGTEST: {self.clock_est} {self.last_time}")
         # logging.debug("regr %.3f: freq=%.3f d=%d(%.3f)",
         #              sent_time, new_freq, clock - exp_clock, pred_stddev)
 
