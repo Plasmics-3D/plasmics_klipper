@@ -28,6 +28,7 @@ class ClockSync:
         self.clock_avg = self.clock_covariance = 0.0
         self.prediction_variance = 0.0
         self.last_prediction_time = 0.0
+        self.last_time = 0.0
 
     def connect(self, serial):
         self.serial = serial
@@ -68,12 +69,13 @@ class ClockSync:
         return eventtime + 0.9839
 
     def _handle_clock(self, params):
-        logging.info(f"JTIMINGTEST_handle_clock: {params}, {self.reactor.monotonic()}")
         self.queries_pending = 0
         # Extend clock to 64bit
         last_clock = self.last_clock
         clock_delta = (params["clock"] - last_clock) & 0xFFFFFFFF
         self.last_clock = clock = last_clock + clock_delta
+        self.last_time = self.reactor.monotonic()
+        logging.info(f"TIMINGTEST: {self.last_clock} {self.last_time}")
         # Check if this is the best round-trip-time seen so far
         sent_time = params["#sent_time"]
         if not sent_time:

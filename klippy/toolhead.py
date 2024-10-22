@@ -242,6 +242,7 @@ class ToolHead:
         self.lookahead.set_flush_time(BUFFER_TIME_HIGH)
         self.commanded_pos = [0.0, 0.0, 0.0, 0.0]
         # Velocity and acceleration control
+        self.old_velocity = 0.0
         self.max_velocity = config.getfloat("max_velocity", above=0.0)
         self.max_accel = config.getfloat("max_accel", above=0.0)
         self.min_cruise_ratio = config.getfloat(
@@ -408,6 +409,12 @@ class ToolHead:
             next_move_time = (
                 next_move_time + move.accel_t + move.cruise_t + move.decel_t
             )
+            if self.old_velocity != move.cruise_v:
+                self.old_velocity = move.cruise_v
+                now = self.reactor.monotonic()
+                logging.info(
+                    f"JTIMINGTEST: toolhead: {now} {self.mcu._clocksync.clock_to_print_time(self.mcu._clocksync.last_clock)}  {self.mcu._clocksync.last_time}, next_move_time: {next_move_time}, velocity: {move.cruise_v}"
+                )
             for cb in move.timing_callbacks:
                 cb(next_move_time)
         # Generate steps for moves
