@@ -416,7 +416,7 @@ class ToolHead:
                 self.old_velocity = move.cruise_v
                 now = self.reactor.monotonic()
                 logging.info(
-                    f"JTIMINGTEST real: toolhead: {now} {self.mcu._clocksync.clock_to_print_time(self.mcu._clocksync.clock_avg)}  {self.mcu._clocksync.last_time}, next_move_time: {next_move_time}, velocity: {move.cruise_v}"
+                    f"JTIMINGTEST real: toolhead: {now} {self.mcu._clocksync.clock_to_print_time(self.mcu._clocksync.last_clock)}  {self.mcu._clocksync.last_time}, next_move_time: {next_move_time}, velocity: {move.cruise_v}"
                 )
             for cb in move.timing_callbacks:
                 cb(next_move_time)

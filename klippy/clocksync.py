@@ -143,7 +143,7 @@ class ClockSync:
 
         self.last_time = self.reactor.monotonic()
         logging.info(
-            f"TIMINGTEST: {self.clock_to_print_time(self.clock_avg)} {self.last_time}"
+            f"TIMINGTEST: {self.clock_to_print_time(self.last_clock)} {self.last_time}"
         )
         # logging.debug("regr %.3f: freq=%.3f d=%d(%.3f)",
         #              sent_time, new_freq, clock - exp_clock, pred_stddev)
