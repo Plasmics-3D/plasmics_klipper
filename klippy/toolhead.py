@@ -387,6 +387,16 @@ class ToolHead:
             logging.info(
                 f"JTIMINGTEST: toolhead: {now}, next_move_time: {next_move_time} move start:{move.start_pos} move end:{move.end_pos}, timings: {move.accel_t}, {move.cruise_t}, {move.decel_t}, {move.accel_t + move.cruise_t + move.decel_t}, velocity: {move.cruise_v}"
             )
+            if self.old_velocity != move.cruise_v:
+                self.old_velocity = move.cruise_v
+                now = self.reactor.monotonic()
+                logging.info(
+                    f"JTIMINGTEST real: toolhead: {now} {self.mcu._clocksync.clock_to_print_time(self.mcu._clocksync.last_clock)}  {self.mcu._clocksync.last_time}, next_move_time: {next_move_time}, velocity: {move.cruise_v} move start:{move.start_pos} move end:{move.end_pos}"
+                )
+                if move.cruise_v == 51:
+                    logging.info(
+                        f"JTIMINGTEST relevant: {now} {self.mcu._clocksync.clock_to_print_time(self.mcu._clocksync.last_clock)}  {self.mcu._clocksync.last_time}, next_move_time: {next_move_time}, velocity: {move.cruise_v} move start:{move.start_pos} move end:{move.end_pos}"
+                    )
             if move.is_kinematic_move:
                 self.trapq_append(
                     self.trapq,
@@ -412,12 +422,7 @@ class ToolHead:
             logging.info(
                 f"JTIMINGTEST after: toolhead: {now}, next_move_time: {next_move_time} move start:{move.start_pos} move end:{move.end_pos}, timings: {move.accel_t}, {move.cruise_t}, {move.decel_t}, {move.accel_t + move.cruise_t + move.decel_t}, velocity: {move.cruise_v}"
             )
-            if self.old_velocity != move.cruise_v:
-                self.old_velocity = move.cruise_v
-                now = self.reactor.monotonic()
-                logging.info(
-                    f"JTIMINGTEST real: toolhead: {now} {self.mcu._clocksync.clock_to_print_time(self.mcu._clocksync.last_clock)}  {self.mcu._clocksync.last_time}, next_move_time: {next_move_time}, velocity: {move.cruise_v}"
-                )
+
             for cb in move.timing_callbacks:
                 cb(next_move_time)
         # Generate steps for moves
