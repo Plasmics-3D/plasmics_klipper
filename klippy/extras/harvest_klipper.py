@@ -27,6 +27,7 @@ class HarvestKlipper:
             "current_toolhead_position": 0,
             "current_section": "",
             "take_snapshot_in": -1,
+            "nr_snapshots": 0,
             "last_move_data": {},
         }
         logging.info("J: Harvest-klipper initiated!")
@@ -55,9 +56,10 @@ class HarvestKlipper:
         self.status_object["current_toolhead_position"] = self._get_printer_position(
             eventtime
         )
-        self.status_object["take_snapshot_in"] = (
-            self.next_snapshot_countdown - eventtime
-        )
+        tmp = self.next_snapshot_countdown - eventtime
+        if tmp < 0:
+            tmp = -1
+        self.status_object["take_snapshot_in"] = tmp
 
         return self.status_object
 
@@ -109,15 +111,15 @@ class HarvestKlipper:
             + data["last_mcu_time"]
         )
         self.status_object["last_move_data"] = data
+        self.status_object["nr_snapshots"] += 1
 
     def _get_printer_position(self, eventtime):
         if self.virtual_sdcard.is_active():
             try:
                 status = self.motion_report.get_status(eventtime)
-                current_position = ",".join(
+                line = ",".join(
                     [str(round(i, 3)) for i in list(status["live_position"])]
                 )
-                line = f"eventtime:{round(eventtime,5)},position:{current_position},velocity:{round(status['live_velocity'],3)},extruder_velocity:{round(status['live_extruder_velocity'],3)},live_acceleration:{round(status['live_acceleration'],3)}"
             except Exception as e:
                 logging.error(f"J: Harvest-klipper printer position ERROR: {e}")
                 line = f"no position"
