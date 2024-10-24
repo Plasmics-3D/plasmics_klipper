@@ -55,7 +55,7 @@ class HarvestKlipper:
         self.status_object["current_toolhead_position"] = self._get_printer_position(
             eventtime
         )
-        self.status_object["current_toolhead_position"] = (
+        self.status_object["take_snapshot_in"] = (
             self.next_snapshot_countdown - eventtime
         )
 
