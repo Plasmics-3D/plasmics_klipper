@@ -383,20 +383,29 @@ class ToolHead:
         # Queue moves into trapezoid motion queue (trapq)
         next_move_time = self.print_time
         for move in moves:
-            now = self.reactor.monotonic()
-            logging.info(
-                f"JTIMINGTEST: toolhead: {now}, next_move_time: {next_move_time} move start:{move.start_pos} move end:{move.end_pos}, timings: {move.accel_t}, {move.cruise_t}, {move.decel_t}, {move.accel_t + move.cruise_t + move.decel_t}, velocity: {move.cruise_v}"
-            )
+            # now = self.reactor.monotonic()
+            # logging.info(
+            #     f"JTIMINGTEST: toolhead: {now}, next_move_time: {next_move_time} move start:{move.start_pos} move end:{move.end_pos}, timings: {move.accel_t}, {move.cruise_t}, {move.decel_t}, {move.accel_t + move.cruise_t + move.decel_t}, velocity: {move.cruise_v}"
+            # )
             if self.old_velocity != move.cruise_v:
                 self.old_velocity = move.cruise_v
-                now = self.reactor.monotonic()
-                logging.info(
-                    f"JTIMINGTEST real: toolhead: {now} {self.mcu._clocksync.clock_to_print_time(self.mcu._clocksync.last_clock)}  {self.mcu._clocksync.last_time}, next_move_time: {next_move_time}, velocity: {move.cruise_v} move start:{move.start_pos} move end:{move.end_pos}"
-                )
-                if move.cruise_v == 51:
-                    logging.info(
-                        f"JTIMINGTEST relevant: {now} {self.mcu._clocksync.clock_to_print_time(self.mcu._clocksync.last_clock)}  {self.mcu._clocksync.last_time}, next_move_time: {next_move_time}, velocity: {move.cruise_v} move start:{move.start_pos} move end:{move.end_pos}"
-                    )
+                if abs(move.cruise_v - 51) < 0.01:
+                    now = self.reactor.monotonic()
+                    data = {
+                        "eventtime": now,
+                        "last_mcu_clock_print_time": self.mcu._clocksync.clock_to_print_time(
+                            self.mcu._clocksync.last_clock
+                        ),
+                        "last_mcu_time": self.mcu._clocksync.last_time,
+                        "start_move_time": next_move_time,
+                        "move_duration": move.accel_t + move.cruise_t + move.decel_t,
+                        "velocity": move.cruise_v,
+                        "move_start": move.start_pos,
+                        "move_end": move.end_pos,
+                    }
+                    if "harvest_klipper" in self.printer.objects:
+                        self.printer.lookup_object("harvest_klipper").process_move(data)
+
             if move.is_kinematic_move:
                 self.trapq_append(
                     self.trapq,
