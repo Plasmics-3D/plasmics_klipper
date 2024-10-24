@@ -428,9 +428,9 @@ class ToolHead:
             next_move_time = (
                 next_move_time + move.accel_t + move.cruise_t + move.decel_t
             )
-            logging.info(
-                f"JTIMINGTEST after: toolhead: {now}, next_move_time: {next_move_time} move start:{move.start_pos} move end:{move.end_pos}, timings: {move.accel_t}, {move.cruise_t}, {move.decel_t}, {move.accel_t + move.cruise_t + move.decel_t}, velocity: {move.cruise_v}"
-            )
+            # logging.info(
+            #     f"JTIMINGTEST after: toolhead: {now}, next_move_time: {next_move_time} move start:{move.start_pos} move end:{move.end_pos}, timings: {move.accel_t}, {move.cruise_t}, {move.decel_t}, {move.accel_t + move.cruise_t + move.decel_t}, velocity: {move.cruise_v}"
+            # )
 
             for cb in move.timing_callbacks:
                 cb(next_move_time)
