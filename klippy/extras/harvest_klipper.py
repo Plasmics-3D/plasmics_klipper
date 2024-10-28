@@ -112,7 +112,7 @@ class HarvestKlipper:
         )
 
         if self.status_object["current_section"] == "CALIBRATION":
-            self.next_snapshot_countdown += data["duration"]
+            self.next_snapshot_countdown += data["move_duration"]
         self.status_object["last_move_data"] = data
         self.status_object["nr_snapshots"] += 1
 
