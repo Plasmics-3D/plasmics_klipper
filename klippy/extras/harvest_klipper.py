@@ -29,7 +29,10 @@ class HarvestKlipper:
             "take_snapshot_in": -1,
             "nr_snapshots": 0,
             "last_move_data": {},
+            "snapshot_queue": [],
         }
+
+        self.status_object = self.standard_status_object.copy()
         logging.info("J: Harvest-klipper initiated!")
         self.printer = config.get_printer()
         self.reactor = self.printer.get_reactor()
@@ -38,10 +41,6 @@ class HarvestKlipper:
         self.virtual_sdcard = self.printer.lookup_object("virtual_sdcard")
         self.status_object = self.standard_status_object.copy()
         self.gcode_counter = 0
-
-        # move information
-        self.next_move_time = 0
-        self.next_snapshot_countdown = 0
 
     def get_status(self, eventtime) -> dict:
         """This function is present in most modules and allows to read out the status of this module
@@ -56,9 +55,11 @@ class HarvestKlipper:
         self.status_object["current_toolhead_position"] = self._get_printer_position(
             eventtime
         )
-        tmp = self.next_snapshot_countdown - eventtime
+        tmp_countdown = self.status_object["snapshot_queue"][0]
+        tmp = tmp_countdown - eventtime
         if tmp < 0:
             tmp = -1
+            self.status_object["snapshot_queue"].pop(0)
         self.status_object["take_snapshot_in"] = tmp
 
         return self.status_object
@@ -99,20 +100,15 @@ class HarvestKlipper:
         # logging.info(f"J: Harvest-klipper: {self.status_object}")
 
     def process_move(self, data):
-        # if the already stored next_move_time is larger than the one in the data, we do not want to update it
-        if self.next_move_time > data["last_mcu_clock_print_time"]:
-            return
-
-        self.next_move_time = data["start_move_time"]
-
-        self.next_snapshot_countdown = (
+        tmp_countdown = (
             data["start_move_time"]
             - data["last_mcu_clock_print_time"]
             + data["last_mcu_time"]
         )
-
         if self.status_object["current_section"] == "CALIBRATION":
-            self.next_snapshot_countdown += data["move_duration"]
+            tmp_countdown += data["move_duration"]
+
+        self.status_object["snapshot_queue"].append(tmp_countdown)
         self.status_object["last_move_data"] = data
         self.status_object["nr_snapshots"] += 1
 

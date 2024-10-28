@@ -73,7 +73,7 @@ class ConstantReadout:
                     msg = client.recv(1024)
                     m = self.decode_socket_answer(msg)
                     klipper_object = m["result"]["status"]["harvest_klipper"]
-                    result = f"{klipper_object['take_snapshot_in']} {klipper_object['last_move_data']['start_move_time']} {klipper_object['last_move_data']['move_duration']}"
+                    result = f"{klipper_object['take_snapshot_in']} {klipper_object['last_move_data']['start_move_time']} {klipper_object['last_move_data']['move_duration']} {klipper_object['last_move_data']['snapshot_queue']}"
                     # responses.append(self.decode_socket_answer(msg))
                     print(f"MESSAGE {result}")
                     with open("result.txt", "+a") as f:
