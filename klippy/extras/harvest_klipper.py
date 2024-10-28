@@ -110,6 +110,9 @@ class HarvestKlipper:
             - data["last_mcu_clock_print_time"]
             + data["last_mcu_time"]
         )
+
+        if self.status_object["current_section"] == "CALIBRATION":
+            self.next_snapshot_countdown += data["duration"]
         self.status_object["last_move_data"] = data
         self.status_object["nr_snapshots"] += 1
 

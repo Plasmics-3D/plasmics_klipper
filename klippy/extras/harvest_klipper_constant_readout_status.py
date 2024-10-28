@@ -72,7 +72,9 @@ class ConstantReadout:
                     client.sendall(i.encode())
                     msg = client.recv(1024)
                     m = self.decode_socket_answer(msg)
-                    result = m["result"]["status"]["harvest_klipper"]
+                    result = m["result"]["status"]["harvest_klipper"][
+                        "take_snapshot_in"
+                    ]
                     # responses.append(self.decode_socket_answer(msg))
                     print(f"MESSAGE {result}")
                     with open("result.txt", "+a") as f:
