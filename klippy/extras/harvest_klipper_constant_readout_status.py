@@ -1,7 +1,7 @@
 import socket, json
 import time
 
-CHECK_HEARTBEAT_INTERVAL = 0.5
+CHECK_HEARTBEAT_INTERVAL = 0.2
 
 
 class ConstantReadout:
