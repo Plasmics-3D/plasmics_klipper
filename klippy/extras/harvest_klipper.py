@@ -55,12 +55,15 @@ class HarvestKlipper:
         self.status_object["current_toolhead_position"] = self._get_printer_position(
             eventtime
         )
-        tmp_countdown = self.status_object["snapshot_queue"][0]
-        tmp = tmp_countdown - eventtime
-        if tmp < 0:
-            tmp = -1
-            self.status_object["snapshot_queue"].pop(0)
-        self.status_object["take_snapshot_in"] = tmp
+        if len(self.status_object["snapshot_queue"]) > 0:
+            tmp_countdown = self.status_object["snapshot_queue"][0]
+            tmp = tmp_countdown - eventtime
+            if tmp < 0:
+                tmp = -1
+                self.status_object["snapshot_queue"].pop(0)
+            self.status_object["take_snapshot_in"] = tmp
+        else:
+            self.status_object["take_snapshot_in"] = -1
 
         return self.status_object
 
