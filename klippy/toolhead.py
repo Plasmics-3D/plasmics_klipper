@@ -389,8 +389,8 @@ class ToolHead:
             # )
             if self.old_velocity != move.cruise_v:
                 self.old_velocity = move.cruise_v
-                tmp = str(round(move.cruise_v * 60))[-2:]
-                if tmp == "60":
+                tmp = str(int(round(move.cruise_v * 60)))
+                if tmp == "6060":
                     now = self.reactor.monotonic()
                     data = {
                         "eventtime": now,
